@@ -1,0 +1,5 @@
+exports.ErrorCodesEnum = Object.freeze({
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  TOKEN_MISSING: "TOKEN_MISSING",
+  USER_NOT_FOUND: "USER_NOT_FOUND"
+});

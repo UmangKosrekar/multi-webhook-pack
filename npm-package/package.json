@@ -1,0 +1,22 @@
+{
+  "name": "multi-webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UmangKosrekar/multi-webhook-npm.git"
+  },
+  "author": "Umang Kosrekar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UmangKosrekar/multi-webhook-npm/issues"
+  },
+  "homepage": "https://github.com/UmangKosrekar/multi-webhook-npm#readme",
+  "dependencies": {
+    "axios": "^1.7.6"
+  }
+}
