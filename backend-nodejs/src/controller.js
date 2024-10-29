@@ -26,6 +26,7 @@ const { CustomError } = require("./helper/customClass");
 
 /**
  * @typedef {Object} WebhookData
+ * @property {string} id
  * @property {string} userUUID
  * @property {string} body
  * @property {string} baseURL
@@ -50,6 +51,7 @@ const webhookData = [];
 exports.webhook = (req, res, next) => {
   try {
     webhookData.push({
+      id: randomUUID(),
       baseURL: req.originalUrl.replace(`/${req.params.uuid}`, ""),
       body: req.body,
       createAt: new Date(),
@@ -119,6 +121,12 @@ exports.listWebhook = async (req, res, next) => {
     }
 
     const filteredData = webhookData.filter((x) => x.userUUID === decodedData.userUUID && (getNew ? !x.viewed : true));
+
+    webhookData.forEach((value) => {
+      if (filteredData.some((x) => x.id === value.id)) {
+        value.viewed = true;
+      }
+    });
 
     return responseHandler(req, res, 200, undefined, filteredData);
   } catch (error) {
