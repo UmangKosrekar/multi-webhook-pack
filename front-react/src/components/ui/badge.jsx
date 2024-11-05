@@ -1,4 +1,3 @@
-import * as React from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -14,11 +13,11 @@ const badgeVariants = cva(
         outline: "text-foreground",
 
         // Custom variants
-        post: "border-transparent bg-orange-500 text-white shadow hover:bg-orange-400",
-        get: "border-transparent bg-green-500 text-white shadow hover:bg-green-400",
-        put: "border-transparent bg-purple-500 text-white shadow hover:bg-purple-400",
-        patch: "border-transparent bg-purple-500 text-white shadow hover:bg-purple-400",
-        delete: "border-transparent bg-red-600 text-white shadow hover:bg-red-500"
+        POST: "border-transparent bg-orange-500 text-white shadow hover:bg-orange-400",
+        GET: "border-transparent bg-green-500 text-white shadow hover:bg-green-400",
+        PUT: "border-transparent bg-purple-500 text-white shadow hover:bg-purple-400",
+        PATCH: "border-transparent bg-purple-500 text-white shadow hover:bg-purple-400",
+        DELETE: "border-transparent bg-red-600 text-white shadow hover:bg-red-500"
       }
     },
     defaultVariants: {

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -14,11 +15,12 @@ export default function App() {
           <AppSidebar />
           <main className="w-full text-align">
             <div className="flex items-center justify-center min-w-screen mt-2 mb-10">
-              <div className="text-4xl font-bold text-gray-800">Multi-Webhook</div>
+              <div className="text-4xl font-light">Multi-Webhook</div>
             </div>
             <Routes>
               <Route index element={<Home />} />
             </Routes>
+            <Toaster position="top-right" />
           </main>
         </SidebarProvider>
       </div>
