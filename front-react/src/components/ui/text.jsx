@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +7,10 @@ const textVariants = cva(
   "scroll-m-20 tracking-tight", // Base styles applied to all text elements
   {
     variants: {
-      variant: {
-        lead: "text-xl text-muted-foreground",
-        muted: "text-sm text-muted-foreground"
+      style: {
+        lead: "text-xl",
+        muted: "text-sm text-muted-foreground",
+        table_text: "text-sm"
       }
     },
     defaultVariants: {
@@ -20,9 +20,9 @@ const textVariants = cva(
   }
 );
 
-const Text = React.forwardRef(({ variant, className, ...props }, ref) => {
+const Text = React.forwardRef(({ variant, style = "lead", className, ...props }, ref) => {
   const Comp = variant || "p";
-  return <Comp className={cn(textVariants({ variant, className }))} ref={ref} {...props} />;
+  return <Comp className={cn(textVariants({ variant, style, className }))} ref={ref} {...props} />;
 });
 
 Text.displayName = "Text";

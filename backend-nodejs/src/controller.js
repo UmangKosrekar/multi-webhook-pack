@@ -26,13 +26,15 @@ const { CustomError } = require("./helper/customClass");
 
 /**
  * @typedef {Object} WebhookData
- * @property {string} id
- * @property {string} userUUID
+ * @property {import("node:crypto").UUID} id
+ * @property {import("node:crypto").UUID} userUUID
  * @property {string} body
  * @property {string} baseURL
  * @property {Date} createAt
  * @property {boolean} viewed
  * @property {string} method
+ * @property {Object} headers
+ * @property {Number} size
  */
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -57,7 +59,9 @@ exports.webhook = (req, res, next) => {
       createAt: new Date(),
       userUUID: req.params.uuid,
       viewed: false,
-      method: req.method
+      method: req.method,
+      headers: req.headers,
+      size: Buffer.byteLength(String(req.body).trim())
     });
 
     return res.send(true);
@@ -122,8 +126,40 @@ exports.listWebhook = async (req, res, next) => {
 
     const filteredData = webhookData.filter((x) => x.userUUID === decodedData.userUUID && (getNew ? !x.viewed : true));
 
+    return responseHandler(req, res, 200, undefined, filteredData);
+  } catch (error) {
+    next(error);
+    return;
+  }
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+
+/**
+@param {Request} req
+@param {Response} res
+@param {NextFunction} next
+*/
+exports.viewHook = async (req, res, next) => {
+  try {
+    /** @type {Headers} */
+    const { authorization } = req.headers;
+    const { id } = req.params;
+
+    // decoding and verify data
+    if (!authorization) {
+      throw new CustomError("Token Missing", ErrorCodesEnum.TOKEN_MISSING, 400);
+    }
+
+    let decodedData;
+    try {
+      decodedData = verify(authorization, process.env.JWT_TOKEN);
+    } catch (error) {
+      throw new CustomError("User not found", ErrorCodesEnum.USER_NOT_FOUND, 400);
+    }
+
     webhookData.forEach((value) => {
-      if (filteredData.some((x) => x.id === value.id)) {
+      if (id === value.id) {
         value.viewed = true;
       }
     });

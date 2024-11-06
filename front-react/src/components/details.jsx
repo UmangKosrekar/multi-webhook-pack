@@ -6,7 +6,6 @@ import moment from "moment-timezone";
 import { toast } from "sonner";
 import { ScrollArea } from "./ui/scroll-area";
 
-// Helper function to copy JSON to clipboard
 const copyToClipboard = (content) => {
   navigator.clipboard.writeText(JSON.stringify(content, null, 2)).then(
     () => toast.info("Copied!"),
@@ -17,19 +16,17 @@ const copyToClipboard = (content) => {
 const Details = ({ selectedHook }) => {
   console.log("selectedHook", selectedHook);
 
-  if (!selectedHook) {
-    return <div>Select Hook from list</div>;
-  }
+  if (!selectedHook) return <div>Select Hook from list</div>;
 
-  const requestDetails = [
-    { label: "Method", value: selectedHook.method },
-    { label: "Base URL", value: selectedHook.baseURL },
-    { label: "Host", value: selectedHook.host },
-    { label: "Date", value: moment(selectedHook.createAt).format("lll") },
-    { label: "Size", value: Buffer.byteLength(selectedHook.body) || 0 },
-    { label: "ID", value: selectedHook.id },
-    { label: "Note", value: selectedHook.note }
-  ];
+  const requestDetails = {
+    Method: selectedHook.method,
+    "Base URL": selectedHook.baseURL,
+    Host: selectedHook.host,
+    Date: moment(selectedHook.createAt).format("lll"),
+    Size: formatSize(selectedHook.size || 0),
+    ID: selectedHook.id,
+    Note: selectedHook.note
+  };
 
   return (
     <div className="min-h-screen flex flex-col mt-2">
@@ -38,38 +35,22 @@ const Details = ({ selectedHook }) => {
           <div className="grid grid-rows-1 grid-cols-2 h-1/2">
             <Card className="bg-transparent">
               <CardHeader>
-                <Text variant="h5" className="font-bold">
+                <Text style="lead" variant="h5" className="font-bold">
                   Request Details
                 </Text>
               </CardHeader>
-              <CardContent>
-                <table className="w-full table-auto">
-                  <tbody>
-                    {requestDetails.map((detail, index) => (
-                      <tr key={detail.label} className={`text-sm ${index % 2 === 0 ? "bg-accent" : ""}`}>
-                        <td className="px-2">{detail.label}</td>
-                        <td>{detail.value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
+              <CardContent>{makeTable(requestDetails)}</CardContent>
             </Card>
 
-            <Card className="p-4 overflow-y-auto max-h-96 bg-transparent">
+            <Card className="bg-transparent">
               <CardHeader>
                 <Text variant="h5" className="font-bold">
                   Headers
                 </Text>
               </CardHeader>
-              <CardContent>
-                {selectedHook.headers &&
-                  Object.entries(selectedHook.headers).map(([key, value]) => (
-                    <Text key={key} className="mb-2">
-                      <strong>{key}:</strong> {value}
-                    </Text>
-                  ))}
-              </CardContent>
+              <ScrollArea style={{ height: "30vh" }}>
+                <CardContent>{makeTable(selectedHook.headers)}</CardContent>
+              </ScrollArea>
             </Card>
           </div>
 
@@ -97,3 +78,36 @@ const Details = ({ selectedHook }) => {
 };
 
 export default Details;
+
+function formatSize(bytes) {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  } else if (bytes < 1024 * 1024) {
+    const kb = (bytes / 1024).toFixed(2);
+    return `${kb} KB`;
+  } else {
+    const mb = (bytes / (1024 * 1024)).toFixed(2);
+    return `${mb} MB`;
+  }
+}
+
+function makeTable(obj) {
+  const array = Object.entries(obj);
+
+  return (
+    <table className="w-full table-auto">
+      <tbody>
+        {array.map((entry, i) => (
+          <tr key={entry[0]} className={`text-sm ${i % 2 === 0 ? "bg-accent" : ""}`}>
+            <td className="px-2">
+              <Text style="table_text">{entry[0]}</Text>
+            </td>
+            <td>
+              <Text style="table_text">{entry[1]}</Text>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
