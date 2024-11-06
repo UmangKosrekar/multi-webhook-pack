@@ -1,81 +1,99 @@
 /* eslint-disable react/prop-types */
-import moment from "moment-timezone";
-
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
+import moment from "moment-timezone";
 import { toast } from "sonner";
-// import { useMail } from "@/app/(app)/examples/mail/use-mail";
+import { ScrollArea } from "./ui/scroll-area";
 
-// export default function MailList() {
-export default function MailList({ items }) {
-  //   const [mail, setMail] = useMail();
+// Helper function to copy JSON to clipboard
+const copyToClipboard = (content) => {
+  navigator.clipboard.writeText(JSON.stringify(content, null, 2)).then(
+    () => toast.info("Copied!"),
+    () => console.error("Copy failed")
+  );
+};
+
+const Details = ({ selectedHook }) => {
+  console.log("selectedHook", selectedHook);
+
+  if (!selectedHook) {
+    return <div>Select Hook from list</div>;
+  }
+
+  const requestDetails = [
+    { label: "Method", value: selectedHook.method },
+    { label: "Base URL", value: selectedHook.baseURL },
+    { label: "Host", value: selectedHook.host },
+    { label: "Date", value: moment(selectedHook.createAt).format("lll") },
+    { label: "Size", value: Buffer.byteLength(selectedHook.body) || 0 },
+    { label: "ID", value: selectedHook.id },
+    { label: "Note", value: selectedHook.note }
+  ];
 
   return (
-    <ScrollArea className="h-screen">
-      <div className="flex flex-col gap-2 p-4 pt-0">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className={cn(
-              "flex flex-col items-start gap-2 rounded-lg border border-opacity-25 p-3 text-left text-sm transition-all hover:bg-accent overflow-hidden list-card"
-              //   ,mail.selected === item.id && "bg-muted"
-            )}
-            // onClick={() =>
-            //   setMail({
-            //     ...mail,
-            //     selected: item.id
-            //   })
-            // }
-          >
-            <div className="flex items-center gap-2">
-              {!item.viewed && <span className="h-2 w-2 rounded-full bg-blue-600" />}
-              <div>
-                <Badge variant={item.method}>{item.method.toUpperCase()}</Badge>
-                <span className="text-xs ml-1 truncate overflow-hidden text-muted-foreground">
-                  {item.baseURL || "/"}
-                </span>
-              </div>
-            </div>
+    <div className="min-h-screen flex flex-col mt-2">
+      {selectedHook && (
+        <Card className="w-full h-full bg-transparent">
+          <div className="grid grid-rows-1 grid-cols-2 h-1/2">
+            <Card className="bg-transparent">
+              <CardHeader>
+                <Text variant="h5" className="font-bold">
+                  Request Details
+                </Text>
+              </CardHeader>
+              <CardContent>
+                <table className="w-full table-auto">
+                  <tbody>
+                    {requestDetails.map((detail, index) => (
+                      <tr key={detail.label} className={`text-sm ${index % 2 === 0 ? "bg-accent" : ""}`}>
+                        <td className="px-2">{detail.label}</td>
+                        <td>{detail.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
 
-            <div
-              className={cn(
-                "ml-1 text-xs text-muted-foreground"
-                // ,mail.selected === item.id ? "text-foreground" : "text-muted-foreground"
-              )}
-            >
-              {moment(item.createAt).tz("Asia/Calcutta").format("lll")}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  navigator.clipboard.writeText(JSON.stringify(item.body)).catch(() => {
-                    console.log("error");
-                  });
-                  toast.info("Copied!");
-                }}
-              >
-                Copy Body
-              </Button>
-            </div>
+            <Card className="p-4 overflow-y-auto max-h-96 bg-transparent">
+              <CardHeader>
+                <Text variant="h5" className="font-bold">
+                  Headers
+                </Text>
+              </CardHeader>
+              <CardContent>
+                {selectedHook.headers &&
+                  Object.entries(selectedHook.headers).map(([key, value]) => (
+                    <Text key={key} className="mb-2">
+                      <strong>{key}:</strong> {value}
+                    </Text>
+                  ))}
+              </CardContent>
+            </Card>
           </div>
-        ))}
-      </div>
-    </ScrollArea>
-  );
-}
 
-/**
-  {
-    "id": "4ae5cd30-c676-482d-ace8-da9f9fc7401c",
-    "baseURL": "",
-    "body": {
-        "oop": "Great 1"
-    },
-    "createAt": "2024-11-05T06:34:24.808Z",
-    "userUUID": "a5ad363e-b48f-4041-aca5-28fef9d4e3ce",
-    "viewed": true,
-    "method": "POST"
-  }
- */
+          <div className="p-4 mt-4 h-1/2">
+            <CardHeader>
+              <Text variant="h5" className="font-bold flex justify-between items-center">
+                Body
+                <Button size="sm" variant="outline" className="mt-4" onClick={() => copyToClipboard(selectedHook.body)}>
+                  Copy
+                </Button>
+              </Text>
+            </CardHeader>
+            <ScrollArea style={{ height: "45.6vh" }} className="border-2 rounded-lg bg-accent">
+              <CardContent>
+                <div className="w-full flex justify-start">
+                  <pre className="p-4 text-wrap text-left font-mono">{JSON.stringify(selectedHook.body, null, 2)}</pre>
+                </div>
+              </CardContent>
+            </ScrollArea>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default Details;

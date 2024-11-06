@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -86,7 +88,7 @@
     --secondary-foreground: 210 50% 90%; /* Light text on secondary elements */
     --muted: 220 20% 30%; /* Muted background */
     --muted-foreground: 210 40% 70%; /* Light muted text */
-    --accent: 0 0% 8%; /* Teal accent color */
+    --accent: 216 10% 15%; /* Teal accent color */
     --accent-foreground: 210 50% 95%; /* Light text for accent elements */
     --destructive: 0 100% 50%; /* Bright red for destructive actions */
     --destructive-foreground: 210 50% 95%; /* Light text on destructive elements */
@@ -102,7 +104,7 @@
     --sidebar-foreground: 210 50% 95%; /* Sidebar text */
     --sidebar-primary: 220 80% 50%; /* Sidebar primary color */
     --sidebar-primary-foreground: 0 0% 100%; /* White text for primary sidebar */
-    --sidebar-accent: 190 60% 30%; /* Darker teal accent */
+    --sidebar-accent: 216 10% 15%; /* Darker teal accent */
     --sidebar-accent-foreground: 210 50% 95%; /* Light text for sidebar accents */
     --sidebar-border: 220 25% 25%; /* Darker border for sidebar */
     --sidebar-ring: 210 40% 60%; /* Ring color for sidebar elements */
@@ -119,6 +121,14 @@
   }
 }
 
+body {
+  font-family: "Ubuntu", sans-serif;
+}
+
 .list-card {
   background-color: hsl(130, 0%, 5%);
+}
+
+.list-card:hover {
+  background-color: hsl();
 }

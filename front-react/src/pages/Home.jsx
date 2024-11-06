@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import List from "@/components/list";
+import Details from "@/components/details";
 import { toast } from "sonner";
 import axios from "axios";
 
 function Home() {
   const [hooks, setHooks] = useState([]);
+  const [selectedHook, setSelectedHook] = useState(undefined);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const baseURL = "http://localhost:5001/";
 
@@ -18,12 +20,11 @@ function Home() {
       const newToken = data.data.token;
       setToken(newToken);
       localStorage.setItem("token", newToken);
-
-      console.log("Fetched new token:", newToken);
-      return newToken;
+      localStorage.setItem("webhookLink", data.data.webhookLink);
+      return;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to generate token. Please try again.");
-      return null;
+      return;
     }
   })();
 
@@ -35,7 +36,7 @@ function Home() {
         headers: { Authorization: token }
       });
       setHooks(data.data);
-      console.log("Fetched data:", data.data);
+      setSelectedHook(data.data[0]);
     } catch (error) {
       const message = error.response?.data?.message || "Failed to fetch data. Please try again.";
       toast.error(message);
@@ -43,21 +44,24 @@ function Home() {
   };
 
   useEffect(() => {
+    fetchData();
+
     const intervalId = setInterval(() => {
       fetchData();
-    }, 3000);
+    }, 9000);
 
     return () => clearInterval(intervalId);
   }, [token]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={20} collapsible={true} minSize={20} maxSize={45}>
-        <span className="text-3xl flex justify-left ml-5 mb-5 font-light">History</span>
-        <List items={hooks} />
+      <ResizablePanel defaultSize={20} collapsible={true} minSize={20} maxSize={45} className="list-card pt-5">
+        <List items={hooks} setSelectedHook={setSelectedHook} selectedHook={selectedHook} />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel>Two</ResizablePanel>
+      <ResizablePanel>
+        <Details selectedHook={selectedHook} />
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 }
