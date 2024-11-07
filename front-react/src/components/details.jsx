@@ -26,7 +26,7 @@ const Details = ({ selectedHook }) => {
     { label: "Base URL", value: selectedHook.baseURL },
     { label: "Host", value: selectedHook.host },
     { label: "Date", value: moment(selectedHook.createAt).format("lll") },
-    { label: "Size", value: Buffer.byteLength(selectedHook.body) || 0 },
+    { label: "Size", value: formatSize(selectedHook.size || 0) },
     { label: "ID", value: selectedHook.id },
     { label: "Note", value: selectedHook.note }
   ];
@@ -97,3 +97,18 @@ const Details = ({ selectedHook }) => {
 };
 
 export default Details;
+
+function formatSize(bytes) {
+  if (bytes < 1024) {
+    // If less than 1KB, show in bytes
+    return `${bytes} Byte${bytes === 1 ? "" : "s"}`;
+  } else if (bytes < 1024 * 1024) {
+    // If less than 1MB, show in KB
+    const kb = (bytes / 1024).toFixed(2);
+    return `${kb} KB`;
+  } else {
+    // If 1MB or more, show in MB
+    const mb = (bytes / (1024 * 1024)).toFixed(2);
+    return `${mb} MB`;
+  }
+}
