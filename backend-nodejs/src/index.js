@@ -1,6 +1,7 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
 const express = require("express");
 const cors = require("cors");
+const { socketServer } = require("./socket");
 
 /**
  * Example of multi-webhook
@@ -19,4 +20,7 @@ app.use(cors());
 app.use(require("./router"));
 app.use(require("./helper/handles").errorHandler);
 
-app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
+const server = app.listen(PORT, () => {
+  console.log(`http://localhost:${PORT}`);
+});
+socketServer(server);

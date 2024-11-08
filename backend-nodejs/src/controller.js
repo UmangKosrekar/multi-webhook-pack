@@ -1,8 +1,10 @@
-const { sign, verify } = require("jsonwebtoken");
+const { sign } = require("./helper/common");
 const { randomUUID } = require("node:crypto");
 const { responseHandler } = require("./helper/handles");
-const { ErrorCodesEnum } = require("./helper/constants");
-const { CustomError } = require("./helper/customClass");
+const { getIo } = require("./socket");
+const { socketEventEnum } = require("./helper/constants");
+// const { ErrorCodesEnum } = require("./helper/constants");
+// const { CustomError } = require("./helper/customClass");
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,11 +19,7 @@ const { CustomError } = require("./helper/customClass");
  * @property {string} userUUID
  * @property {string} IP
  * @property {Date} createdAt
- */
-
-/**
- * @typedef {Object} Headers
- * @property {Token} token
+ * @property {string=} socketId
  */
 
 /**
@@ -52,6 +50,7 @@ const webhookData = [];
 
 exports.webhook = (req, res, next) => {
   try {
+    const io = getIo();
     webhookData.push({
       id: randomUUID(),
       baseURL: req.originalUrl.replace(`/${req.params.uuid}`, ""),
@@ -63,6 +62,8 @@ exports.webhook = (req, res, next) => {
       headers: req.headers,
       size: Buffer.byteLength(String(req.body).trim())
     });
+
+    io.to(req.user.socketId).emit(socketEventEnum.emit.HOOK, { msg: "Success" });
 
     return res.send(true);
   } catch (error) {
@@ -87,7 +88,7 @@ exports.makeAuthenticationToken = async (req, res, next) => {
       userUUID: randomUUID()
     };
 
-    const getToken = sign(_token, process.env.JWT_TOKEN);
+    const getToken = sign(_token);
 
     return responseHandler(req, res, 200, "Authentication Token created", {
       token: getToken,
@@ -108,23 +109,9 @@ exports.makeAuthenticationToken = async (req, res, next) => {
 */
 exports.listWebhook = async (req, res, next) => {
   try {
-    /** @type {Headers} */
-    const { authorization } = req.headers;
     const { getNew } = req.query;
 
-    // decoding and verify data
-    if (!authorization) {
-      throw new CustomError("Token Missing", ErrorCodesEnum.TOKEN_MISSING, 400);
-    }
-
-    let decodedData;
-    try {
-      decodedData = verify(authorization, process.env.JWT_TOKEN);
-    } catch (error) {
-      throw new CustomError("User not found", ErrorCodesEnum.USER_NOT_FOUND, 400);
-    }
-
-    const filteredData = webhookData.filter((x) => x.userUUID === decodedData.userUUID && (getNew ? !x.viewed : true));
+    const filteredData = webhookData.filter((x) => x.userUUID === req.decoded.userUUID && (getNew ? !x.viewed : true));
 
     return responseHandler(req, res, 200, undefined, filteredData);
   } catch (error) {
@@ -142,21 +129,7 @@ exports.listWebhook = async (req, res, next) => {
 */
 exports.viewHook = async (req, res, next) => {
   try {
-    /** @type {Headers} */
-    const { authorization } = req.headers;
     const { id } = req.params;
-
-    // decoding and verify data
-    if (!authorization) {
-      throw new CustomError("Token Missing", ErrorCodesEnum.TOKEN_MISSING, 400);
-    }
-
-    let decodedData;
-    try {
-      decodedData = verify(authorization, process.env.JWT_TOKEN);
-    } catch (error) {
-      throw new CustomError("User not found", ErrorCodesEnum.USER_NOT_FOUND, 400);
-    }
 
     webhookData.forEach((value) => {
       if (id === value.id) {
