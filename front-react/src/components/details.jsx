@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import moment from "moment-timezone";
 import { toast } from "sonner";
 import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 
 const copyToClipboard = (content) => {
   navigator.clipboard.writeText(JSON.stringify(content, null, 2)).then(
@@ -36,6 +37,7 @@ const Details = ({ selectedHook }) => {
                 <Text style="lead" variant="h5" className="font-bold">
                   Request Details
                 </Text>
+                <Separator />
               </CardHeader>
               <CardContent>{makeTable(requestDetails)}</CardContent>
             </Card>
@@ -45,6 +47,7 @@ const Details = ({ selectedHook }) => {
                 <Text variant="h5" className="font-bold">
                   Headers
                 </Text>
+                <Separator />
               </CardHeader>
               <ScrollArea style={{ height: "30vh" }}>
                 <CardContent>{makeTable(selectedHook.headers)}</CardContent>
@@ -60,6 +63,7 @@ const Details = ({ selectedHook }) => {
                   Copy
                 </Button>
               </Text>
+              <Separator />
             </CardHeader>
             <ScrollArea style={{ height: "45.6vh" }} className="border-2 rounded-lg bg-accent">
               <CardContent>

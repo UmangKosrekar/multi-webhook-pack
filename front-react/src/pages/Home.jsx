@@ -53,21 +53,21 @@ function Home() {
         reconnectionDelay: 1000
       });
 
-      // generic type
-      socket.on("connect", () => {
-        console.info("connected", socket.id);
-      });
-      socket.on("connection_error", (error) => {
-        console.info("connection_error", error);
-      });
-      socket.on("disconnect", (reason) => {
-        console.info("Disconnected from server", reason);
-      });
+      // // generic type
+      // socket.on("connect", () => {
+      //   console.info("connected", socket.id);
+      // });
+      // socket.on("connection_error", (error) => {
+      //   console.info("connection_error", error);
+      // });
+      // socket.on("disconnect", (reason) => {
+      //   console.info("Disconnected from server", reason);
+      // });
 
       // custom listeners
-      socket.on("broadcast", (data) => {
-        console.log("broadcast", data);
-      });
+      // socket.on("broadcast", (data) => {
+      //   console.log("broadcast", data);
+      // });
 
       socket.on("hook", (data) => {
         console.log("hook", data);
@@ -84,7 +84,6 @@ function Home() {
       await axios
         .put(baseURL + "view/" + selectedHook.id, undefined, { headers: { Authorization: token } })
         .then(({ data }) => {
-          console.log("data", data.data);
           setHooks(data.data);
         })
         .catch(() => {
@@ -92,7 +91,6 @@ function Home() {
         });
     };
 
-    console.log(selectedHook);
     if (selectedHook?.id) {
       setViewAPI();
     }
