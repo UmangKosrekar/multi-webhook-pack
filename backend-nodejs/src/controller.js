@@ -1,3 +1,5 @@
+// --------------------------------------------------------------------------------------------------------------------
+
 const { sign } = require("./helper/common");
 const { randomUUID } = require("node:crypto");
 const { responseHandler } = require("./helper/handles");
@@ -51,7 +53,8 @@ const webhookData = [];
 exports.webhook = (req, res, next) => {
   try {
     const io = getIo();
-    webhookData.push({
+
+    const hook = {
       id: randomUUID(),
       baseURL: req.originalUrl.replace(`/${req.params.uuid}`, ""),
       body: req.body,
@@ -61,9 +64,14 @@ exports.webhook = (req, res, next) => {
       method: req.method,
       headers: req.headers,
       size: Buffer.byteLength(String(req.body).trim())
-    });
+    };
+    webhookData.unshift(hook);
 
-    io.to(req.user.socketId).emit(socketEventEnum.emit.HOOK, { msg: "Success" });
+    // const clients = io.sockets.adapter.rooms.get(req.params.uuid);
+    // console.trace("clients", clients);
+    // console.trace("uuid", req.params.uuid);
+
+    io.to(req.params.uuid).emit(socketEventEnum.emit.HOOK, hook);
 
     return res.send(true);
   } catch (error) {
@@ -137,7 +145,7 @@ exports.viewHook = async (req, res, next) => {
       }
     });
 
-    return responseHandler(req, res, 200, undefined, filteredData);
+    return responseHandler(req, res, 200, undefined, webhookData);
   } catch (error) {
     next(error);
     return;

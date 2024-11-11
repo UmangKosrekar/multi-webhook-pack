@@ -1,4 +1,3 @@
-const { sign } = require("./helper/common");
 const { socketEventEnum } = require("./helper/constants");
 const socketMiddleware = require("./middleware/socketAuth");
 let ioInstance;
@@ -7,15 +6,9 @@ const channel = (io) => {
   io.use((socket, next) => socketMiddleware(socket, next));
 
   io.on(socketEventEnum.receive.CONNECTION, (socket) => {
-    console.trace(socket.decoded);
+    socket.join(socket.decoded.userUUID);
 
-    io.to(socket.id).emit(
-      socketEventEnum.emit.TOKEN,
-      (() => {
-        const token = sign({ ...socket.decoded, socketId: socket.id });
-        return { token };
-      })()
-    );
+    socket.to(socket.decoded.userUUID).emit(socketEventEnum.emit.BROADCAST, "new connection");
   });
 
   // error handling

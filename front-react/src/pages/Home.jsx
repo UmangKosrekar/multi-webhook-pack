@@ -4,6 +4,7 @@ import List from "@/components/list";
 import Details from "@/components/details";
 import { toast } from "sonner";
 import axios from "axios";
+import socketIo from "socket.io-client";
 
 function Home() {
   const [hooks, setHooks] = useState([]);
@@ -11,47 +12,91 @@ function Home() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const baseURL = "http://localhost:5001/";
 
-  (async () => {
-    if (token) return token;
+  useEffect(() => {
+    const fetchToken = async () => {
+      if (token) return token;
 
-    try {
-      const { data } = await axios.get(baseURL + "generate-token");
-      toast.success(data.message);
-      const newToken = data.data.token;
-      setToken(newToken);
-      localStorage.setItem("token", newToken);
-      localStorage.setItem("webhookLink", data.data.webhookLink);
-      return;
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to generate token. Please try again.");
-      return;
-    }
-  })();
+      try {
+        const { data } = await axios.get(baseURL + "generate-token");
+        toast.success(data.message);
 
-  const fetchData = async () => {
-    if (!token) return;
+        setToken(data.data.token);
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("webhookLink", data.data.webhookLink);
+        return;
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to generate token. Please try again.");
+        return;
+      }
+    };
 
-    try {
-      const { data } = await axios.get(baseURL + "list", {
-        headers: { Authorization: token }
+    const fetchData = async () => {
+      if (!token) {
+        await fetchToken();
+      }
+
+      try {
+        const { data } = await axios.get(baseURL + "list", { headers: { Authorization: token } });
+        setHooks(data.data);
+        setSelectedHook(data.data[0]);
+      } catch (error) {
+        const message = error.response?.data?.message || "Failed to fetch data. Please try again.";
+        toast.error(message);
+      }
+    };
+
+    const socketSetup = () => {
+      const socket = socketIo(`${baseURL}?authorization=${token}`, {
+        transports: ["websocket"],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
       });
-      setHooks(data.data);
-      setSelectedHook(data.data[0]);
-    } catch (error) {
-      const message = error.response?.data?.message || "Failed to fetch data. Please try again.";
-      toast.error(message);
-    }
-  };
+
+      // generic type
+      socket.on("connect", () => {
+        console.info("connected", socket.id);
+      });
+      socket.on("connection_error", (error) => {
+        console.info("connection_error", error);
+      });
+      socket.on("disconnect", (reason) => {
+        console.info("Disconnected from server", reason);
+      });
+
+      // custom listeners
+      socket.on("broadcast", (data) => {
+        console.log("broadcast", data);
+      });
+
+      socket.on("hook", (data) => {
+        console.log("hook", data);
+        setHooks((prev) => [data, ...prev]);
+      });
+    };
+
+    fetchData();
+    socketSetup();
+  }, [token]);
 
   useEffect(() => {
-    fetchData();
+    const setViewAPI = async () => {
+      await axios
+        .put(baseURL + "view/" + selectedHook.id, undefined, { headers: { Authorization: token } })
+        .then(({ data }) => {
+          console.log("data", data.data);
+          setHooks(data.data);
+        })
+        .catch(() => {
+          toast.error("Error while connecting server...");
+        });
+    };
 
-    const intervalId = setInterval(() => {
-      fetchData();
-    }, 9000);
-
-    return () => clearInterval(intervalId);
-  }, [token]);
+    console.log(selectedHook);
+    if (selectedHook?.id) {
+      setViewAPI();
+    }
+  }, [selectedHook]);
 
   return (
     <ResizablePanelGroup direction="horizontal">

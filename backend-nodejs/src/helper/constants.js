@@ -7,8 +7,7 @@ exports.ErrorCodesEnum = Object.freeze({
 exports.socketEventEnum = Object.freeze({
   emit: {
     BROADCAST: "broadcast",
-    HOOK: "hook",
-    TOKEN: "token"
+    HOOK: "hook"
   },
   receive: {
     SEND_MSG: "send_msg",

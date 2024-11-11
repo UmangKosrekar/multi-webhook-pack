@@ -14,8 +14,6 @@ const copyToClipboard = (content) => {
 };
 
 const Details = ({ selectedHook }) => {
-  console.log("selectedHook", selectedHook);
-
   if (!selectedHook) return <div>Select Hook from list</div>;
 
   const requestDetails = {

@@ -10,8 +10,6 @@ import { toast } from "sonner";
 
 // export default function List() {
 export default function List({ items, setSelectedHook, selectedHook }) {
-  console.log("LIST selectedHook", selectedHook);
-
   return (
     <>
       <span className="text-3xl flex justify-left ml-2 mb-5 font-light">History</span>
@@ -51,7 +49,7 @@ export default function List({ items, setSelectedHook, selectedHook }) {
                         variant="ghost"
                         onClick={() => {
                           navigator.clipboard.writeText(JSON.stringify(item.body)).catch(() => {
-                            console.log("error");
+                            console.error("error");
                           });
                           toast.info("Copied!");
                         }}
