@@ -10,13 +10,13 @@ const Details = ({ selectedHook }) => {
   if (!selectedHook) return <div>Select Hook from list</div>;
 
   const requestDetails = {
-    Method: selectedHook.method,
-    "Base URL": selectedHook.baseURL,
-    Host: selectedHook.host,
-    Date: moment(selectedHook.createAt).format("lll"),
-    Size: formatSize(selectedHook.size || 0),
-    ID: selectedHook.id,
-    Note: selectedHook.note
+    method: selectedHook.method,
+    "base url": selectedHook.baseURL,
+    host: selectedHook.host,
+    date: moment(selectedHook.createAt).format("lll"),
+    size: formatSize(selectedHook.size || 0),
+    id: selectedHook.id,
+    note: selectedHook.note
   };
 
   return (
