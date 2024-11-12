@@ -10,7 +10,7 @@ function Home() {
   const [hooks, setHooks] = useState([]);
   const [selectedHook, setSelectedHook] = useState(undefined);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const baseURL = "http://localhost:5001/";
+  const baseURL = "http://192.168.1.20:5001/";
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -70,7 +70,6 @@ function Home() {
       // });
 
       socket.on("hook", (data) => {
-        console.log("hook", data);
         setHooks((prev) => [data, ...prev]);
       });
     };

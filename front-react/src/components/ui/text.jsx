@@ -8,9 +8,10 @@ const textVariants = cva(
   {
     variants: {
       style: {
-        lead: "text-xl",
+        lead: "text-md",
         muted: "text-sm text-muted-foreground",
-        table_text: "text-sm"
+        table_text: "text-sm",
+
       }
     },
     defaultVariants: {
@@ -22,7 +23,7 @@ const textVariants = cva(
 
 const Text = React.forwardRef(({ variant, style = "lead", className, ...props }, ref) => {
   const Comp = variant || "p";
-  return <Comp className={cn(textVariants({ variant, style, className }))} ref={ref} {...props} />;
+  return <Comp className={cn(textVariants({ style, className }))} ref={ref} {...props} />;
 });
 
 Text.displayName = "Text";
