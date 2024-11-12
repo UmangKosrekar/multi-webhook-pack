@@ -1,18 +1,10 @@
 /* eslint-disable react/prop-types */
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
 import moment from "moment-timezone";
-import { toast } from "sonner";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
-
-const copyToClipboard = (content) => {
-  navigator.clipboard.writeText(JSON.stringify(content, null, 2)).then(
-    () => toast.info("Copied!"),
-    () => console.error("Copy failed")
-  );
-};
+import { CopyButton } from "./ui/copyBtn";
 
 const Details = ({ selectedHook }) => {
   if (!selectedHook) return <div>Select Hook from list</div>;
@@ -59,9 +51,7 @@ const Details = ({ selectedHook }) => {
             <CardHeader>
               <Text variant="h5" className="font-bold flex justify-between items-center">
                 Body
-                <Button size="sm" variant="outline" className="mt-4" onClick={() => copyToClipboard(selectedHook.body)}>
-                  Copy
-                </Button>
+                <CopyButton body={selectedHook.body} />
               </Text>
               <Separator />
             </CardHeader>

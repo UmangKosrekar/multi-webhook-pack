@@ -4,8 +4,7 @@ import moment from "moment-timezone";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { CopyButton } from "./ui/copyBtn";
 // import { useMail } from "@/app/(app)/examples/mail/use-mail";
 
 // export default function List() {
@@ -44,18 +43,7 @@ export default function List({ items, setSelectedHook, selectedHook }) {
                       )}
                     >
                       {moment(item.createAt).tz("Asia/Calcutta").format("lll")}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          navigator.clipboard.writeText(JSON.stringify(item.body)).catch(() => {
-                            console.error("error");
-                          });
-                          toast.info("Copied!");
-                        }}
-                      >
-                        Copy Body
-                      </Button>
+                      <CopyButton text="Copy Body" body={item.body} />
                     </div>
                   </div>
                 );
